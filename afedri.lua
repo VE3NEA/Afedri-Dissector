@@ -20,7 +20,6 @@ afedri_tcp_protocol = Proto("Afedri",  "Afedri TCP Control Protocol")
 
 function afedri_udp_protocol.dissector(buffer, pinfo, tree)
     if buffer:len() < 4 then return end
-    if buffer(0,2):le_uint() ~= 0x8404 then return end
     pinfo.cols.protocol = afedri_udp_protocol.name
     subtree = tree:add(afedri_udp_protocol, buffer(), "Afedri Protocol Data")
     Word.dissect(buffer(0, 2), "signature")
@@ -485,17 +484,17 @@ end
 function IqSamples.dissect(data, label)
     local byte_count = data:len()
     if byte_count < 4 then return end    
-    if label == nil then label = "I/Q samples" end
+    if label == nil then label = "I/Q data" end
     local str = "   "
 
     if (byte_count == 1028-4) or (byte_count == 515-4) then width = 2 
     elseif (byte_count == 1444-4) or (byte_count == 388-4) then width = 3 end
 
     local sample_count = math.floor(byte_count / (2 * width))
-    local node = subtree:add(data, label .. string.format(", %d %d-bit samples", sample_count, width * 8))
+    local node = subtree:add(data, label .. string.format(", %d 2x%d-bit samples", sample_count, width * 8))
 
     for i = 0, sample_count-1 do 
-        str = str .. "(" .. sample(data(i*4, width)) .. ", " .. sample(data(i*4+width, width)) .. ")"
+        str = str .. "(" .. sample(data(i*2*width, width)) .. ", " .. sample(data(i*2*width+width, width)) .. ")"
 
         if (i % 4) == 3 then 
             node:add(data((i-3)*2*width, 8 * width), str) 
