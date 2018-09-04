@@ -495,7 +495,7 @@ function IqSamples.dissect(data, label)
     local node = subtree:add(data, label .. string.format(", %d %d-bit samples", sample_count, width * 8))
 
     for i = 0, sample_count-1 do 
-        str = str .. "(" .. sample(data(i*4, width)) .. ", " .. sample16(data(i*4+width, width)) .. ")"
+        str = str .. "(" .. sample(data(i*4, width)) .. ", " .. sample(data(i*4+width, width)) .. ")"
 
         if (i % 4) == 3 then 
             node:add(data((i-3)*2*width, 8 * width), str) 
